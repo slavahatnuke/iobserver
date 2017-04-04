@@ -19,10 +19,10 @@ class Observer {
     }
 }
 
-module.exports.Observer = Observer;
+exports.Observer = Observer;
 
 const observableSymbol = '__symbol_iobserver';
-module.exports.observableSymbol = observableSymbol;
+exports.observableSymbol = observableSymbol;
 
 const observable = (object = {}) => {
     if (!(object instanceof Object)) {
@@ -43,21 +43,21 @@ const observable = (object = {}) => {
         return object;
     }
 };
-module.exports.observable = observable;
+exports.observable = observable;
 
 const observableObserver = (observableObject) => {
     return observable(observableObject)[observableSymbol];
 };
-module.exports.observableObserver = observableObserver;
+exports.observableObserver = observableObserver;
 
 const subscribe = (observableObject, subscriber) => observableObserver(observableObject).subscribe(subscriber);
-module.exports.subscribe = subscribe;
+exports.subscribe = subscribe;
 
 const unsubscribe = (observableObject, subscriber) => observableObserver(observableObject).unsubscribe(subscriber);
-module.exports.unsubscribe = unsubscribe;
+exports.unsubscribe = unsubscribe;
 
 const notify = (observableObject, event = null) => observableObserver(observableObject).notify(event);
-module.exports.notify = notify;
+exports.notify = notify;
 
 const update = (observableObject, updater = () => null) => {
     const push = () => notify(observableObject, observableObject);
@@ -81,4 +81,4 @@ const update = (observableObject, updater = () => null) => {
     }
 };
 
-module.exports.update = update;
+exports.update = update;
