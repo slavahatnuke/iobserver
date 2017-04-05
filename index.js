@@ -35,7 +35,7 @@ const observable = (object = {}) => {
         const observer = new Observer();
 
         Object.defineProperty(object, observableSymbol, {
-            get: () => observer,
+            value: observer,
             enumerable: false,
             configurable: false
         });
