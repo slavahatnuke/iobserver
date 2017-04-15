@@ -191,7 +191,9 @@ module.exports = {
     notify: notify,
     update: update,
     observableObserver: observableObserver,
-    observableSymbol: observableSymbol
+    observableSymbol: observableSymbol,
+    isObject: isObject,
+    isFunction: isFunction
 };
 
 /***/ })

@@ -83,4 +83,6 @@ module.exports = {
     update,
     observableObserver,
     observableSymbol,
+    isObject,
+    isFunction
 };
