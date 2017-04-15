@@ -19,8 +19,6 @@ Observer.prototype = {
 };
 
 const observableSymbol = '__symbol_iobserver';
-exports.observableSymbol = observableSymbol;
-
 const isObject = (object) => object instanceof Object;
 const isFunction = (object) => object instanceof Function;
 
