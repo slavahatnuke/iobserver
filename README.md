@@ -3,7 +3,7 @@ It's classical Observer pattern for any object.
 
 ## Example
 ```javascript
- 		let user = {
+        let user = {
             name: 'slava',
             counter: 0
         };
