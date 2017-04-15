@@ -8,6 +8,8 @@
   },
   "scripts": {
     "test": "mocha",
+    "test.watch": "mocha -w",
+    "test.and.build": "npm run test && npm run build",
     "build": "webpack && webpack --optimize-minimize --output-filename iobserver.min.js"
   },
   "repository": {

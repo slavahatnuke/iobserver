@@ -2,7 +2,8 @@ module.exports = {
     entry: './index.js',
     output: {
         filename: 'iobserver.js',
-        path: `${__dirname}/dist`
+        path: `${__dirname}/dist`,
+        libraryTarget: 'umd'
     },
     module: {
         loaders: [

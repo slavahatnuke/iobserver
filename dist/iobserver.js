@@ -1,4 +1,14 @@
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else {
+		var a = factory();
+		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
+	}
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -73,67 +83,54 @@
 "use strict";
 
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+function Observer() {
+    this.subscribers = [];
+}
+Observer.prototype = {
+    subscribe: function subscribe(subscriber) {
+        if (subscriber instanceof Function) {
+            this.subscribers.push(subscriber);
+        }
+        return this;
+    },
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+    unsubscribe: function unsubscribe(subscriber) {
+        this.subscribers = this.subscribers.filter(function (aSubscriber) {
+            return aSubscriber !== subscriber;
+        });
+    },
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+    notify: function notify() {
+        var event = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
-var Observer = function () {
-    function Observer() {
-        _classCallCheck(this, Observer);
-
-        this.subscribers = [];
+        this.subscribers.forEach(function (subscriber) {
+            return subscriber(event);
+        });
     }
+};
 
-    _createClass(Observer, [{
-        key: 'subscribe',
-        value: function subscribe(subscriber) {
-            if (subscriber instanceof Function) {
-                this.subscribers.push(subscriber);
-            }
-            return this;
-        }
-    }, {
-        key: 'unsubscribe',
-        value: function unsubscribe(subscriber) {
-            this.subscribers = this.subscribers.filter(function (aSubscriber) {
-                return aSubscriber !== subscriber;
-            });
-        }
-    }, {
-        key: 'notify',
-        value: function notify() {
-            var event = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+var observableSymbol = '__symbol_iobserver';
+exports.observableSymbol = observableSymbol;
 
-            this.subscribers.forEach(function (subscriber) {
-                return subscriber(event);
-            });
-        }
-    }]);
-
-    return Observer;
-}();
-
-exports.Observer = Observer;
-
-var observableKey = '__symbol_iobserver';
-exports.observableKey = observableKey;
+var isObject = function isObject(object) {
+    return object instanceof Object;
+};
+var isFunction = function isFunction(object) {
+    return object instanceof Function;
+};
 
 var observable = function observable() {
     var object = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-    if (!(object instanceof Object)) {
-        throw new Error('Do not support this type: ' + (typeof object === 'undefined' ? 'undefined' : _typeof(object)));
+    if (!isObject(object)) {
+        throw new Error('Do not support this: ' + object);
     }
 
-    if (object[observableKey]) {
+    if (object[observableSymbol]) {
         return object;
     } else {
-        var observer = new Observer();
-
-        Object.defineProperty(object, observableKey, {
-            value: observer,
+        Object.defineProperty(object, observableSymbol, {
+            value: new Observer(),
             enumerable: false,
             configurable: false
         });
@@ -141,28 +138,21 @@ var observable = function observable() {
         return object;
     }
 };
-exports.observable = observable;
 
 var observableObserver = function observableObserver(observableObject) {
-    return observable(observableObject)[observableKey];
+    return observable(observableObject)[observableSymbol];
 };
-exports.observableObserver = observableObserver;
-
 var subscribe = function subscribe(observableObject, subscriber) {
     return observableObserver(observableObject).subscribe(subscriber);
 };
-exports.subscribe = subscribe;
 
 var unsubscribe = function unsubscribe(observableObject, subscriber) {
     return observableObserver(observableObject).unsubscribe(subscriber);
 };
-exports.unsubscribe = unsubscribe;
-
 var notify = function notify(observableObject) {
     var event = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
     return observableObserver(observableObject).notify(event);
 };
-exports.notify = notify;
 
 var update = function update(observableObject) {
     var updater = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function () {
@@ -174,26 +164,38 @@ var update = function update(observableObject) {
     };
     var result = updater(observableObject);
 
-    if (result instanceof Object && result.then instanceof Function) {
-        push();
+    return Promise.resolve().then(function () {
 
-        return Promise.resolve().then(function () {
-            return result;
-        }).then(function (result) {
+        if (isObject(result) && isFunction(result.then)) {
+            push();
+
+            return Promise.resolve(result).then(function () {
+                return result;
+            }).then(function (result) {
+                push();
+                return result;
+            }).catch(function (error) {
+                push();
+                return Promise.reject(error);
+            });
+        } else {
             push();
             return result;
-        }).catch(function (error) {
-            push();
-            return Promise.reject(error);
-        });
-    } else {
-        return Promise.resolve().then(function () {
-            return push();
-        });
-    }
+        }
+    });
 };
 
-exports.update = update;
+module.exports = {
+    Observer: Observer,
+    observable: observable,
+    subscribe: subscribe,
+    unsubscribe: unsubscribe,
+    notify: notify,
+    update: update,
+    observableObserver: observableObserver,
+    observableSymbol: observableSymbol
+};
 
 /***/ })
 /******/ ]);
+});
