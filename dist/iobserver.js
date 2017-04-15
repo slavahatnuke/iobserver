@@ -110,8 +110,6 @@ Observer.prototype = {
 };
 
 var observableSymbol = '__symbol_iobserver';
-exports.observableSymbol = observableSymbol;
-
 var isObject = function isObject(object) {
     return object instanceof Object;
 };
